@@ -1,0 +1,16 @@
+/*
+	This TODO file contains a bulletpoint list with all the things yet to
+	implement and all the bugs yet to fix.
+*/
+
+Implementation:
+	
+	- locking mechanism for the Accounts of the tax-men 
+	- function for collecting taxes
+	- tax-men as threads
+	- initialisation function
+	- end function
+	- error handling
+	- input parsing
+
+Bugs:
