@@ -13,22 +13,41 @@ pthread_t *threads;
 int *moneys;
 int stop = 0;
 
-void *tax_collector(){
+void *tax_collector(void *field){
 	/* target is a random number between 0 and NUM_COLLECTORS */
 	int target;
+	int my_tid;
+	int get_money;
+	my_tid =  (long) field;
+	target = my_tid;
 	
-	printf("stop = %i\n",stop);
 	while(!stop){
-		if(target == -1){
-			target = rand() % num_collectors; 
-			/* not a perfect randomness, but it should be sufficient for our
-			 * needs.
-			 */
+		while (my_tid == target){
+			target = rand() % num_collectors;
 		}
-		printf("stop = %i\n",stop);
-		
+			
+		/* not a perfect randomness, but it should be sufficient for our
+			* needs.
+			*/
+		if (moneys[target] < 100 ){
+			get_money = 100;
+			while (moneys[target] < 100){
+				sched_yield();	
+			}
+			moneys[my_tid] += get_money;
+			moneys[target] -= get_money;
+			
+		} else {
+			get_money = moneys[target];
+			get_money = get_money % 100;
+			if (get_money % 2) {get_money++;}
+			get_money = get_money * 50;
+			moneys[my_tid] += get_money;
+			moneys[target] -= get_money;
+		}
+		target = my_tid;
 	}	
-
+	pthread_exit(0);
 	return 0;
 }
 
@@ -36,7 +55,7 @@ int main(int argc, char **argv)
 {
     int start_money = START_AMOUNT_OF_MONEY;
 	int amount_money = start_money;
-	int i;
+	long i;
 	int test;
     int a;    
     
@@ -70,9 +89,9 @@ int main(int argc, char **argv)
 
    	/* initialize the threads array */
 	for(i = 0; i < num_collectors; i++){
-		test = pthread_create(&threads[i], NULL, tax_collector, NULL);
+		test = pthread_create(&threads[i], NULL, tax_collector, (void*) i);
 		if(test){
-			printf("ERROR: could not initialize arrays on index %i\n",i);
+			printf("ERROR: could not initialize arrays on index %li\n",i);
 			exit(-1);
 		}
 	}
