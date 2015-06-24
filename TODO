@@ -6,11 +6,6 @@
 Implementation:
 	
 	- locking mechanism for the Accounts of the tax-men 
-	- function for collecting taxes
-	- tax-men as threads
-	- initialisation function
-	- end function
 	- error handling
-	- input parsing
 
 Bugs:
