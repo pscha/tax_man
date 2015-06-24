@@ -24,7 +24,6 @@ void *tax_collector(){
 			 * needs.
 			 */
 		}
-
 		
 	}	
 
@@ -35,7 +34,7 @@ int main(int argc, char **argv)
 {
     int num_collectors = NUM_COLLECTORS;
     int start_money = START_AMOUNT_OF_MONEY;
-	int amount_money = start_money;
+	int amount_money;
 	int i;
 	int test;
     int a;    
@@ -51,18 +50,21 @@ int main(int argc, char **argv)
    	srand(time(NULL));
 	/* initialize the moneys array */
 	i = 0;
+	amount_money = start_money;
 	while(amount_money > 0){
 		if(amount_money < 100){
 			moneys[i] += amount_money;
+			amount_money -= amount_money;
 		}
 		else{
 			moneys[i] += 100;
+			amount_money -= 100;
 		}
-		i = (i+1) % NUM_COLLECTORS;
+		i = (i+1) % num_collectors;
 	}
 
    	/* initialize the threads array */
-	for(i = 0; i < NUM_COLLECTORS; i++){
+	for(i = 0; i < num_collectors; i++){
 		test = pthread_create(&threads[i], NULL, tax_collector, NULL);
 		if(test){
 			printf("ERROR: could not initialize arrays on index %i\n",i);
@@ -70,5 +72,20 @@ int main(int argc, char **argv)
 		}
 	}
 	
+	sleep(2);
+	printf("after sleep\n");
+	stop = 1;
+	/* collect all threads */
+	for(i=0; i < num_collectors; i++){
+		pthread_join(threads[i], NULL);
+	}
+
+	/* sum up ressources */
+	for(i=0; i < num_collectors; i++){
+		amount_money += moneys[i];
+	}	
+	
+	printf("Ended with: money = %i\n",amount_money);
+
     return 0;
 }
