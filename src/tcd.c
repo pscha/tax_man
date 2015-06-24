@@ -39,7 +39,7 @@ void *tax_collector(void *field){
 			
 		} else {
 			get_money = moneys[target];
-			get_money = get_money % 100;
+			get_money = get_money / 100;
 			if (get_money % 2) {get_money++;}
 			get_money = get_money * 50;
 			moneys[my_tid] += get_money;
@@ -47,6 +47,8 @@ void *tax_collector(void *field){
 		}
 		target = my_tid;
 	}	
+	printf("tid= %i moneys=%i\n",my_tid,moneys[my_tid]);
+	fflush(stdout);
 	pthread_exit(0);
 	return 0;
 }
@@ -54,7 +56,7 @@ void *tax_collector(void *field){
 int main(int argc, char **argv)
 {
     int start_money = START_AMOUNT_OF_MONEY;
-	int amount_money = start_money;
+	int amount_money;
 	long i;
 	int test;
     int a;    
@@ -68,7 +70,7 @@ int main(int argc, char **argv)
 
     printf("Tax Collectors: %d\nAmount of money: %d\n",num_collectors,start_money);
    	srand(time(NULL));
-
+	amount_money = start_money;
 	/* malloc the arrays */
 	threads = malloc(sizeof(pthread_t) * num_collectors);
 	moneys = malloc(sizeof(int) * num_collectors);
@@ -97,7 +99,6 @@ int main(int argc, char **argv)
 	}
 	
 	sleep(20);
-	printf("after sleep\n");
 	stop = 1;
 	/* collect all threads */
 	for(i=0; i < num_collectors; i++){
@@ -108,6 +109,6 @@ int main(int argc, char **argv)
 	for(i=0; i < num_collectors; i++){
 		amount_money += moneys[i];
 	}	
-
+	printf("ended with: amount money = %i\n",amount_money);
     return 0;
 }
