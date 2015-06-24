@@ -13,11 +13,15 @@ pthread_t *threads;
 long *moneys;
 int stop = 0;
 
+#ifdef BIGLOCK
+pthread_mutex_t biglock;
+#endif
+
 void *tax_collector(void *field){
 	/* target is a random number between 0 and NUM_COLLECTORS */
 	int target;
 	int my_tid;
-	int get_money;
+	int get_money = 0;
 	my_tid =  (long) field;
 	target = my_tid;
 	int i = 0;
@@ -29,11 +33,20 @@ void *tax_collector(void *field){
 		/* not a perfect randomness, but it should be sufficient for our
 			* needs.
 			*/
+#ifdef BIGLOCK
+		pthread_mutex_lock(&biglock);
+#endif
 		if (moneys[target] < 100 ){
 			get_money = 100;
 			for(i=0; i<10; i++){ 	
 				if(moneys[target] < 100){
+#ifdef BIGLOCK
+					pthread_mutex_unlock(&biglock);
+#endif
 					sched_yield();	
+#ifdef BIGLOCK
+					pthread_mutex_lock(&biglock);
+#endif
 				}
 				else{
 					moneys[my_tid] += get_money;
@@ -48,10 +61,11 @@ void *tax_collector(void *field){
 			moneys[my_tid] += get_money;
 			moneys[target] -= get_money;
 		}
+#ifdef BIGLOCK
+		pthread_mutex_unlock(&biglock);
+#endif
 		target = my_tid;
 	}	
-	printf("tid= %i moneys=%li\n",my_tid,moneys[my_tid]);
-	fflush(stdout);
 	pthread_exit(0);
 	return 0;
 }
@@ -103,6 +117,7 @@ int main(int argc, char **argv)
 	
 	sleep(20);
 	stop = 1;
+	sleep(3);
 	/* collect all threads */
 	for(i=0; i < num_collectors; i++){
 		pthread_join(threads[i], NULL);
