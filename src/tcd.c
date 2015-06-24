@@ -10,7 +10,7 @@
 #define START_AMOUNT_OF_MONEY   300
 int num_collectors = NUM_COLLECTORS;
 pthread_t *threads;
-int *moneys;
+long *moneys;
 int stop = 0;
 
 void *tax_collector(void *field){
@@ -20,7 +20,7 @@ void *tax_collector(void *field){
 	int get_money;
 	my_tid =  (long) field;
 	target = my_tid;
-	
+	int i = 0;
 	while(!stop){
 		while (my_tid == target){
 			target = rand() % num_collectors;
@@ -31,12 +31,15 @@ void *tax_collector(void *field){
 			*/
 		if (moneys[target] < 100 ){
 			get_money = 100;
-			while (moneys[target] < 100){
-				sched_yield();	
+			for(i=0; i<10; i++){ 	
+				if(moneys[target] < 100){
+					sched_yield();	
+				}
+				else{
+					moneys[my_tid] += get_money;
+					moneys[target] -= get_money;
+				}
 			}
-			moneys[my_tid] += get_money;
-			moneys[target] -= get_money;
-			
 		} else {
 			get_money = moneys[target];
 			get_money = get_money / 100;
@@ -47,7 +50,7 @@ void *tax_collector(void *field){
 		}
 		target = my_tid;
 	}	
-	printf("tid= %i moneys=%i\n",my_tid,moneys[my_tid]);
+	printf("tid= %i moneys=%li\n",my_tid,moneys[my_tid]);
 	fflush(stdout);
 	pthread_exit(0);
 	return 0;
@@ -56,7 +59,7 @@ void *tax_collector(void *field){
 int main(int argc, char **argv)
 {
     int start_money = START_AMOUNT_OF_MONEY;
-	int amount_money;
+	long amount_money;
 	long i;
 	int test;
     int a;    
@@ -73,7 +76,7 @@ int main(int argc, char **argv)
 	amount_money = start_money;
 	/* malloc the arrays */
 	threads = malloc(sizeof(pthread_t) * num_collectors);
-	moneys = malloc(sizeof(int) * num_collectors);
+	moneys = malloc(sizeof(long) * num_collectors);
 
 	/* initialize the moneys array */
 	i = 0;
@@ -109,6 +112,6 @@ int main(int argc, char **argv)
 	for(i=0; i < num_collectors; i++){
 		amount_money += moneys[i];
 	}	
-	printf("ended with: amount money = %i\n",amount_money);
+	printf("ended with: amount money = %li\n",amount_money);
     return 0;
 }
