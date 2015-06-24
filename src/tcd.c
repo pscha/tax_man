@@ -11,12 +11,22 @@
 
 pthread_t threads[NUM_COLLECTORS];
 int moneys[NUM_COLLECTORS];
-
-int ein;
-int aus;
+int stop = 0;
 
 void *tax_collector(){
+	/* target is a random number between 0 and NUM_COLLECTORS */
+	int target;
 	
+	while(!stop){
+		if(target = -1){
+			target = rand() % NUM_COLLECTORS 
+			/* not a perfect randomness, but it should be sufficient for our
+			 * needs.
+			 */
+		}
+		
+	}	
+
 	return 0;
 }
 
@@ -37,7 +47,7 @@ int main(int argc, char **argv)
     }
 
     printf("Tax Collectors: %d\nAmount of money: %d\n",num_collectors,start_money);
-   
+   	srand(time(NULL));
 	/* initialize the moneys array */
 	i = 0;
 	while(amount_money > 0){
