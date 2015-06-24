@@ -18,12 +18,13 @@ void *tax_collector(){
 	int target;
 	
 	while(!stop){
-		if(target = -1){
-			target = rand() % NUM_COLLECTORS 
+		if(target == -1){
+			target = rand() % NUM_COLLECTORS; 
 			/* not a perfect randomness, but it should be sufficient for our
 			 * needs.
 			 */
 		}
+
 		
 	}	
 
