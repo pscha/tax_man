@@ -9,22 +9,22 @@
 #define NUM_COLLECTORS  5
 #define START_AMOUNT_OF_MONEY   300
 
-pthread_d threads[NUM_COLLECTORS];
+pthread_t threads[NUM_COLLECTORS];
 int moneys[NUM_COLLECTORS];
 
 int ein;
 int aus;
 
-void *tax_collector(void *thread_id){
-	(int) thread_id;
+void *tax_collector(){
 	
-	int
+	return 0;
 }
 
 int main(int argc, char **argv)
 {
     int num_collectors = NUM_COLLECTORS;
-    int amount_money = start_money = START_AMOUNT_OF_MONEY;
+    int start_money = START_AMOUNT_OF_MONEY;
+	int amount_money = start_money;
 	int i;
 	int test;
     int a;    
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
 	/* initialize the moneys array */
 	i = 0;
 	while(amount_money > 0){
-		if(amount_money < 100)
+		if(amount_money < 100){
 			moneys[i] += amount_money;
 		}
 		else{
@@ -52,15 +52,12 @@ int main(int argc, char **argv)
 
    	/* initialize the threads array */
 	for(i = 0; i < NUM_COLLECTORS; i++){
-		test = pthread_create(&threads[i], NULL, tax_collector, (void*) i);
+		test = pthread_create(&threads[i], NULL, tax_collector, NULL);
 		if(test){
 			printf("ERROR: could not initialize arrays on index %i\n",i);
 			exit(-1);
 		}
 	}
 	
-		
-
-
     return 0;
 }
