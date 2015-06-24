@@ -8,22 +8,24 @@
 /** NUM_COLLECTORS specifies,how much tax collectors are in the game. */
 #define NUM_COLLECTORS  5
 #define START_AMOUNT_OF_MONEY   300
-
-pthread_t threads[NUM_COLLECTORS];
-int moneys[NUM_COLLECTORS];
+int num_collectors = NUM_COLLECTORS;
+pthread_t *threads;
+int *moneys;
 int stop = 0;
 
 void *tax_collector(){
 	/* target is a random number between 0 and NUM_COLLECTORS */
 	int target;
 	
+	printf("stop = %i\n",stop);
 	while(!stop){
 		if(target == -1){
-			target = rand() % NUM_COLLECTORS; 
+			target = rand() % num_collectors; 
 			/* not a perfect randomness, but it should be sufficient for our
 			 * needs.
 			 */
 		}
+		printf("stop = %i\n",stop);
 		
 	}	
 
@@ -32,9 +34,8 @@ void *tax_collector(){
 
 int main(int argc, char **argv)
 {
-    int num_collectors = NUM_COLLECTORS;
     int start_money = START_AMOUNT_OF_MONEY;
-	int amount_money;
+	int amount_money = start_money;
 	int i;
 	int test;
     int a;    
@@ -48,9 +49,13 @@ int main(int argc, char **argv)
 
     printf("Tax Collectors: %d\nAmount of money: %d\n",num_collectors,start_money);
    	srand(time(NULL));
+
+	/* malloc the arrays */
+	threads = malloc(sizeof(pthread_t) * num_collectors);
+	moneys = malloc(sizeof(int) * num_collectors);
+
 	/* initialize the moneys array */
 	i = 0;
-	amount_money = start_money;
 	while(amount_money > 0){
 		if(amount_money < 100){
 			moneys[i] += amount_money;
@@ -72,7 +77,7 @@ int main(int argc, char **argv)
 		}
 	}
 	
-	sleep(2);
+	sleep(20);
 	printf("after sleep\n");
 	stop = 1;
 	/* collect all threads */
@@ -84,8 +89,6 @@ int main(int argc, char **argv)
 	for(i=0; i < num_collectors; i++){
 		amount_money += moneys[i];
 	}	
-	
-	printf("Ended with: money = %i\n",amount_money);
 
     return 0;
 }
