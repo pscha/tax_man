@@ -11,6 +11,8 @@
 int num_collectors = NUM_COLLECTORS;
 pthread_t *threads;
 long *moneys;
+long *ins;
+long *outs;
 int stop = 0;
 
 #ifdef BIGLOCK
@@ -51,6 +53,8 @@ void *tax_collector(void *field){
 				else{
 					moneys[my_tid] += get_money;
 					moneys[target] -= get_money;
+					ins[my_tid]++;
+					outs[target]++;
 				}
 			}
 		} else {
@@ -60,6 +64,8 @@ void *tax_collector(void *field){
 			get_money = get_money * 50;
 			moneys[my_tid] += get_money;
 			moneys[target] -= get_money;
+			ins[my_tid]++;
+			outs[target]++;
 		}
 #ifdef BIGLOCK
 		pthread_mutex_unlock(&biglock);
@@ -74,6 +80,8 @@ int main(int argc, char **argv)
 {
     int start_money = START_AMOUNT_OF_MONEY;
 	long amount_money;
+	long total_in=0;
+	long total_out=0;
 	long i;
 	int test;
     int a;    
@@ -91,6 +99,8 @@ int main(int argc, char **argv)
 	/* malloc the arrays */
 	threads = malloc(sizeof(pthread_t) * num_collectors);
 	moneys = malloc(sizeof(long) * num_collectors);
+	ins = malloc(sizeof(long) * num_collectors);
+	outs = malloc(sizeof(long) * num_collectors);
 
 	/* initialize the moneys array */
 	i = 0;
@@ -126,7 +136,10 @@ int main(int argc, char **argv)
 	/* sum up ressources */
 	for(i=0; i < num_collectors; i++){
 		amount_money += moneys[i];
+		total_in += ins[i];
+		total_out += outs[i];
+		printf("Collector %li hat: money=%li, in=%li, out=%li\n",i,moneys[i],ins[i],outs[i]);
 	}	
-	printf("ended with: amount money = %li\n",amount_money);
+	printf("ended with: amount money = %li, total_ins=%li, total_outs=%li\n",amount_money,total_in,total_out);
     return 0;
 }
