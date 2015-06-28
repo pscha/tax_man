@@ -50,14 +50,27 @@ void *tax_collector(void *field){
 #ifdef BIGLOCK
 					pthread_mutex_unlock(&biglock);
 #endif
-					sched_yield();	
+					sched_yield();
 #ifdef BIGLOCK
 					pthread_mutex_lock(&biglock);
 #endif
 				}
 				else{
+#ifdef MULTILOCK
+					if(target < my_tid){
+						pthread_mutex_lock(&multilock[target]);
+						pthread_mutex_lock(&multilock[my_tid]);
+					}else{
+						pthread_mutex_lock(&multilock[my_tid]);
+						pthread_mutex_lock(&multilock[target]);
+					}
+#endif					
 					moneys[my_tid] += get_money;
 					moneys[target] -= get_money;
+#ifdef MULTILOCK
+					pthread_mutex_unlock(&multilock[target]);
+					pthread_mutex_unlock(&multilock[my_tid]);
+#endif					
 					ins[my_tid]++;
 					outs[target]++;
 				}
@@ -107,9 +120,9 @@ int main(int argc, char **argv)
 	ins = malloc(sizeof(long) * num_collectors);
 	outs = malloc(sizeof(long) * num_collectors);
 
-	#ifdef MULTILOCK
+#ifdef MULTILOCK
 	multilock = malloc(sizeof(pthread_mutex_t) * num_collectors);
-	#endif
+#endif
 
 
 	/* initialize the moneys array */
@@ -133,9 +146,9 @@ int main(int argc, char **argv)
 			printf("ERROR: could not initialize arrays on index %li\n",i);
 			exit(-1);
 		}
-		#ifdef MULTILOCK
+#ifdef MULTILOCK
 		pthread_mutex_init(&multilock[i],NULL);
-		#endif
+#endif
 
 	}
 	
