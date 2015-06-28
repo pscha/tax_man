@@ -60,9 +60,12 @@ void *tax_collector(void *field){
 					if(target < my_tid){
 						pthread_mutex_lock(&multilock[target]);
 						pthread_mutex_lock(&multilock[my_tid]);
+			//			printf("Thread %d locked and target %d locked\n",my_tid,target);
 					}else{
 						pthread_mutex_lock(&multilock[my_tid]);
 						pthread_mutex_lock(&multilock[target]);
+			//			printf("Thread %d locked and target %d locked\n",my_tid,target);
+						
 					}
 #endif					
 					moneys[my_tid] += get_money;
@@ -70,18 +73,35 @@ void *tax_collector(void *field){
 #ifdef MULTILOCK
 					pthread_mutex_unlock(&multilock[target]);
 					pthread_mutex_unlock(&multilock[my_tid]);
+			//		printf("Thread %d and %d unlocked\n",my_tid,target);
 #endif					
 					ins[my_tid]++;
 					outs[target]++;
 				}
 			}
 		} else {
+#ifdef MULTILOCK
+			if(target < my_tid){
+				pthread_mutex_lock(&multilock[target]);
+				pthread_mutex_lock(&multilock[my_tid]);
+			//	printf("Thread %d locked and target %d locked\n",my_tid,target);
+			}else{
+				pthread_mutex_lock(&multilock[my_tid]);
+				pthread_mutex_lock(&multilock[target]);
+			//	printf("Thread %d locked and target %d locked\n",my_tid,target);
+			}
+#endif
 			get_money = moneys[target];
 			get_money = get_money / 100;
 			if (get_money % 2) {get_money++;}
 			get_money = get_money * 50;
 			moneys[my_tid] += get_money;
 			moneys[target] -= get_money;
+#ifdef MULTILOCK
+			pthread_mutex_unlock(&multilock[target]);
+			pthread_mutex_unlock(&multilock[my_tid]);
+		//	printf("Thread %d and %d unlocked\n",my_tid,target);
+#endif					
 			ins[my_tid]++;
 			outs[target]++;
 		}
@@ -149,7 +169,6 @@ int main(int argc, char **argv)
 #ifdef MULTILOCK
 		pthread_mutex_init(&multilock[i],NULL);
 #endif
-
 	}
 	
 	sleep(20);
@@ -159,7 +178,7 @@ int main(int argc, char **argv)
 	for(i=0; i < num_collectors; i++){
 		pthread_join(threads[i], NULL);
 	}
-
+	
 	/* sum up ressources */
 	for(i=0; i < num_collectors; i++){
 		amount_money += moneys[i];
