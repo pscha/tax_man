@@ -19,6 +19,11 @@ int stop = 0;
 pthread_mutex_t biglock;
 #endif
 
+#ifdef MULTILOCK
+pthread_mutex_t *multilock;
+#endif
+
+
 void *tax_collector(void *field){
 	/* target is a random number between 0 and NUM_COLLECTORS */
 	int target;
@@ -102,6 +107,11 @@ int main(int argc, char **argv)
 	ins = malloc(sizeof(long) * num_collectors);
 	outs = malloc(sizeof(long) * num_collectors);
 
+	#ifdef MULTILOCK
+	multilock = malloc(sizeof(pthread_mutex_t) * num_collectors);
+	#endif
+
+
 	/* initialize the moneys array */
 	i = 0;
 	while(amount_money > 0){
@@ -123,6 +133,10 @@ int main(int argc, char **argv)
 			printf("ERROR: could not initialize arrays on index %li\n",i);
 			exit(-1);
 		}
+		#ifdef MULTILOCK
+		pthread_mutex_init(&multilock[i],NULL);
+		#endif
+
 	}
 	
 	sleep(20);
