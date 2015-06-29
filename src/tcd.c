@@ -137,6 +137,12 @@ int main(int argc, char **argv)
     }
 
     printf("Tax Collectors: %d\nAmount of money: %d\n",num_collectors,start_money);
+#ifdef MULTILOCK
+	printf("MULTILOCK \t activated \n");
+#endif
+#ifdef BIGLOCK
+	printf("BIGLOCK \t activated \n");
+#endif 
    	srand(time(NULL));
 	amount_money = start_money;
 	/* malloc the arrays */
@@ -190,8 +196,8 @@ int main(int argc, char **argv)
 		amount_money += moneys[i];
 		total_in += ins[i];
 		total_out += outs[i];
-		printf("Collector %li hat: money=%li, in=%li, out=%li\n",i,moneys[i],ins[i],outs[i]);
+		printf("Collector %li  has:\t money=%li,\t in=%li,\t out=%li\n",i,moneys[i],ins[i],outs[i]);
 	}	
-	printf("ended with: amount money = %li, total_ins=%li, total_outs=%li\n",amount_money,total_in,total_out);
+	printf("ended with: amount money = %li,\t total_ins=%li,\t total_outs=%li\n",amount_money,total_in,total_out);
     return 0;
 }
