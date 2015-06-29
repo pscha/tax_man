@@ -32,6 +32,11 @@ void *tax_collector(void *field){
 	my_tid =  (long) field;
 	target = my_tid;
 	int i = 0;
+	
+	while(stop){
+		
+	}
+	
 	while(!stop){
 		while (my_tid == target){
 			target = rand() % num_collectors;
@@ -158,7 +163,8 @@ int main(int argc, char **argv)
 		}
 		i = (i+1) % num_collectors;
 	}
-
+	
+	stop = 1;
    	/* initialize the threads array */
 	for(i = 0; i < num_collectors; i++){
 		test = pthread_create(&threads[i], NULL, tax_collector, (void*) i);
@@ -170,7 +176,7 @@ int main(int argc, char **argv)
 		pthread_mutex_init(&multilock[i],NULL);
 #endif
 	}
-	
+	stop = 0; 
 	sleep(20);
 	stop = 1;
 	sleep(3);
