@@ -75,13 +75,15 @@ void *tax_collector(void *field){
 #endif					
 					moneys[my_tid] += get_money;
 					moneys[target] -= get_money;
+					ins[my_tid]++;
+					outs[target]++;
+
 #ifdef MULTILOCK
 					pthread_mutex_unlock(&multilock[target]);
 					pthread_mutex_unlock(&multilock[my_tid]);
 			//		printf("Thread %d and %d unlocked\n",my_tid,target);
+
 #endif					
-					ins[my_tid]++;
-					outs[target]++;
 				}
 			}
 		} else {
